@@ -1,0 +1,34 @@
+{
+  "programming_languages": {
+    "Python": ["python", "py"],
+    "Java": ["java"],
+    "C++": ["c++", "cpp"],
+    "JavaScript": ["javascript", "js"]
+  },
+
+  "web_development": {
+    "HTML": ["html"],
+    "CSS": ["css"],
+    "React": ["react", "reactjs"],
+    "Node.js": ["node", "node.js", "express"]
+  },
+
+  "databases": {
+    "SQL": ["sql", "mysql", "postgresql", "sqlite"],
+    "NoSQL": ["mongodb", "redis"]
+  },
+
+  "data_science": {
+    "Machine Learning": ["machine learning", "ml"],
+    "Deep Learning": ["deep learning", "dl"],
+    "NLP": ["nlp", "natural language processing"],
+    "Pandas": ["pandas"],
+    "NumPy": ["numpy"]
+  },
+
+  "devops_cloud": {
+    "Git": ["git", "github", "gitlab"],
+    "Docker": ["docker"],
+    "AWS": ["aws", "amazon web services"]
+  }
+}
