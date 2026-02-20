@@ -18,20 +18,42 @@ TECH_TERMS = {
 }
 
 CANONICAL_MAP = {
+    # Frontend
     "html5": "html",
     "css3": "css",
     "vanilla javascript": "javascript",
-    "javascript file handling": "javascript",
+    "js": "javascript",
+
+    # Backend
     "python scripts": "python",
-    "developed python scripts": "python"
+    "developed python scripts": "python",
+    "restful api": "rest",
+    "restful apis": "rest",
+    "rest api": "rest",
+    "rest apis": "rest",
+
+    # Cloud / DevOps
+    "amazon web services": "aws",
+    "node.js": "node",
+    "nodejs": "node",
+
+    # ML
+    "ml": "machine learning",
+    "deep learning models": "deep learning"
 }
 
 
 def normalize_skill(phrase: str):
-    phrase = phrase.strip()
+    phrase = phrase.strip().lower()
 
+    # Exact canonical mapping
     if phrase in CANONICAL_MAP:
         return CANONICAL_MAP[phrase]
+
+    # Partial canonical mapping
+    for key in CANONICAL_MAP:
+        if key in phrase:
+            return CANONICAL_MAP[key]
 
     return phrase
 
@@ -61,7 +83,8 @@ def extract_skills(text: str):
         word = token.text.strip()
 
         if word in TECH_TERMS:
-            detected.append(word)
+            normalized = normalize_skill(word)
+            detected.append(normalized)
 
         if word in CANONICAL_MAP:
             detected.append(CANONICAL_MAP[word])
@@ -69,7 +92,7 @@ def extract_skills(text: str):
     # 2️⃣ Multi-word phrase matching
     for phrase in TECH_TERMS:
         if " " in phrase and phrase in text:
-            detected.append(phrase)
+            detected.append(normalize_skill(phrase))
 
     # Count frequency
     skill_counts = Counter(detected)
