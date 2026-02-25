@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume Screener - Results</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <h1>AI Resume Screener</h1>
+
+    <div class="container results-page">
+        <div class="results-header">
+            <h2>Your Analysis</h2>
+            <button class="back-button" onclick="window.location.href='index.html'">← New Analysis</button>
+        </div>
+
+        <div id="results">
+            Loading results...
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const stored = sessionStorage.getItem("analysisResult");
+            if (!stored) {
+                const resultsDiv = document.getElementById("results");
+                resultsDiv.innerText = "No analysis found. Please go back and analyze a resume.";
+                return;
+            }
+
+            try {
+                const data = JSON.parse(stored);
+                displayResults(data);
+            } catch (e) {
+                const resultsDiv = document.getElementById("results");
+                resultsDiv.innerText = "Could not load analysis results.";
+            }
+        });
+    </script>
+</body>
+</html>
+

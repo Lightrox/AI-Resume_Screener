@@ -8,11 +8,19 @@ from app.skill_engine.skill_extractor import extract_skills
 from app.scoring.ats_scorer import compute_ats_score
 from .parser.resume_parser import parse_resume
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 class JDInput(BaseModel):
     job_description: str
 
 app = FastAPI(title="AI Resume Screener")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)

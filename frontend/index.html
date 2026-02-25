@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume Screener</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<h1>AI Resume Screener</h1>
+
+<div class="container">
+
+    <input type="file" id="resumeFile" accept=".pdf,.docx" />
+
+    <textarea id="jdText" placeholder="Paste Job Description here..."></textarea>
+
+    <button onclick="analyzeResume()">Analyze</button>
+
+    <div id="results"></div>
+
+</div>
+
+<script src="./script.js"></script>
+</body>
+</html>
