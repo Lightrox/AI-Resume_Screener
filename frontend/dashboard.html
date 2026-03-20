@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Resume Screener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="dashboard" class="dashboard-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span>ScreenerAI</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">Dashboard</a>
+            <a href="index.html#upload" class="nav-item">Upload</a>
+            <a href="results.html" class="nav-item">Results</a>
+        </nav>
+        <div class="sidebar-footer">
+            <span id="sidebarSessionInfo" class="text-xs text-muted">Loading session...</span>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="dash-header">
+            <div>
+                <h1>Candidate Insights</h1>
+                <p class="text-muted">Detailed breakdown of applicant's match against the job role.</p>
+            </div>
+            <a href="index.html#upload" class="btn btn-secondary btn-sm">New Analysis</a>
+        </div>
+
+        <div id="dashboardLoading">
+            <div class="spinner"></div>
+            <p>Loading your results...</p>
+        </div>
+
+        <div id="dashboardContent" class="dashboard-grid hidden">
+            
+            <!-- Left Column Structure -->
+            <div class="grid-col-left">
+                <!-- Score Breakdown -->
+                <div class="card ats-card">
+                    <div class="ats-card-content">
+                        <div class="circle-score-wrapper">
+                            <svg class="circle-score" width="120" height="120" viewBox="0 0 120 120">
+                                <circle class="circle-score-bg" cx="60" cy="60" r="48" />
+                                <circle class="circle-score-fill" cx="60" cy="60" r="48" />
+                            </svg>
+                            <div class="circle-score-text">
+                                <span id="atsScoreValue">0</span>
+                            </div>
+                        </div>
+                        <div class="ats-info">
+                            <h3>ATS Match Score</h3>
+                            <p>Overall compatibility based on JD.</p>
+                            <div class="pill-group">
+                                <span class="tag tag-soft" id="pillMatchLevel">Analyzing...</span>
+                                <span class="tag tag-soft" id="pillConfidence">Conf: --</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Overview -->
+                <div class="card">
+                    <h3>Candidate Summary</h3>
+                    <p id="candidateSummaryText" class="text-secondary text-sm line-clamp-4">Summary will appear here.</p>
+                </div>
+
+                <!-- Top Skills -->
+                <div class="card">
+                    <h3>Top Skills Extracted</h3>
+                    <div class="skills-container" id="skillsContainer">
+                        <!-- Populated by script.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column Structure -->
+            <div class="grid-col-right">
+                
+                <!-- Keyword Match Analysis -->
+                <div class="card keyword-card">
+                    <h3>Keyword Match Analysis</h3>
+                    <div class="keyword-columns">
+                        <div class="keyword-col">
+                            <h4 class="text-success">Matched Keywords</h4>
+                            <div class="chips-list" id="keywordsMatched">
+                                <span class="text-muted text-sm">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="keyword-col">
+                            <h4 class="text-warning">Missing Keywords</h4>
+                            <div class="chips-list" id="keywordsMissing">
+                                <span class="text-muted text-sm">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggested Roles -->
+                <div class="card">
+                    <h3>Suggested Role Matches</h3>
+                    <div class="job-matches-list" id="jobMatches">
+                        <!-- Populated by script.js -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast UI -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

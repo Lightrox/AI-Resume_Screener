@@ -1,42 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>AI Resume Screener - Results</title>
-    <link rel="stylesheet" href="./style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - AI Resume Screener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <h1>AI Resume Screener</h1>
+<body data-page="results" class="dashboard-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span>ScreenerAI</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">Dashboard</a>
+            <a href="index.html#upload" class="nav-item">Upload</a>
+            <a href="results.html" class="nav-item active">Results</a>
+        </nav>
+        <div class="sidebar-footer">
+            <span id="sidebarSessionInfo" class="text-xs text-muted">Loading session...</span>
+        </div>
+    </aside>
 
-    <div class="container results-page">
-        <div class="results-header">
-            <h2>Your Analysis</h2>
-            <button class="back-button" onclick="window.location.href='index.html'">← New Analysis</button>
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="dash-header">
+            <div>
+                <h1>Raw Analysis Results</h1>
+                <p class="text-muted">View the detailed JSON output of your latest scan.</p>
+            </div>
+            <a href="index.html#upload" class="btn btn-primary btn-sm">New Analysis</a>
         </div>
 
-        <div id="results">
-            Loading results...
+        <div id="results" class="results-container">
+            <div style="text-align: center; padding: 4rem 0;">
+                <div class="spinner"></div>
+                <p class="text-muted">Loading results...</p>
+            </div>
         </div>
-    </div>
+    </main>
 
-    <script src="./script.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const stored = sessionStorage.getItem("analysisResult");
-            if (!stored) {
-                const resultsDiv = document.getElementById("results");
-                resultsDiv.innerText = "No analysis found. Please go back and analyze a resume.";
-                return;
-            }
-
-            try {
-                const data = JSON.parse(stored);
-                displayResults(data);
-            } catch (e) {
-                const resultsDiv = document.getElementById("results");
-                resultsDiv.innerText = "Could not load analysis results.";
-            }
-        });
-    </script>
+    <!-- Toast UI -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <script src="script.js"></script>
 </body>
 </html>
-
