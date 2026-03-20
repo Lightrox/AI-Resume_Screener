@@ -1,5 +1,7 @@
 fastapi
 uvicorn
+gunicorn
+python-multipart
 pdfplumber
 python-docx
 spacy
