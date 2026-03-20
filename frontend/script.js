@@ -45,7 +45,7 @@ async function analyzeResume(e) {
     // Visual locking
     analyzeButton.disabled = true;
     analyzeButton.classList.add("is-loading");
-    analyzeButton.textContent = "Analyzing…";
+    analyzeButton.textContent = "Analyzing...";
 
     showToast("Running AI analysis...", "info");
 
@@ -65,7 +65,7 @@ async function analyzeResume(e) {
         sessionStorage.setItem("analysisResult", JSON.stringify(data));
         localStorage.setItem("analysisResult", JSON.stringify(data));
         
-        showToast("Analysis complete. Loading dashboard…", "success");
+        showToast("Analysis complete. Loading dashboard...", "success");
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 500);
@@ -136,7 +136,6 @@ function initLandingPage() {
 function initDashboardPage() {
     const loading = document.getElementById("dashboardLoading");
     const content = document.getElementById("dashboardContent");
-    const sessionInfo = document.getElementById("sidebarSessionInfo");
 
     const stored = sessionStorage.getItem("analysisResult") || localStorage.getItem("analysisResult");
     
@@ -144,9 +143,9 @@ function initDashboardPage() {
         if (loading) loading.classList.add("hidden");
         if (content) {
             content.classList.remove("hidden");
+            content.style.display = "block";
             content.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 6rem 2rem;"><p class="text-muted" style="margin-bottom: 1.5rem;">No active analysis found. Run a new scan from the landing page.</p><a href="index.html#upload" class="btn btn-primary">Go to Upload</a></div>';
         }
-        if (sessionInfo) sessionInfo.textContent = "No session active";
         return;
     }
 
@@ -154,21 +153,80 @@ function initDashboardPage() {
     try {
         data = JSON.parse(stored);
     } catch {
-        if (sessionInfo) sessionInfo.textContent = "Format error in memory";
         return;
-    }
-
-    if (sessionInfo) {
-        sessionInfo.textContent = "Session: Active";
     }
 
     if (loading) loading.classList.add("hidden");
     if (content) content.classList.remove("hidden");
 
-    // Populate Score
-    const atsScore = Math.round(data.overall_match ?? 0);
-    const confidence = Math.round(data.confidence_score ?? 0);
+    // Populate Mentorship Panel (Top)
+    const rec = data.match_level || "Moderate Match";
+    const readiness = data.job_readiness || "Partially Ready";
+    
+    let statusCls = "status-consider";
+    let badgeCls = "badge-consider";
+    let icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
 
+    if (rec === "Low Match") {
+        statusCls = "status-reject";
+        badgeCls = "badge-reject";
+        icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+    } else if (rec === "High Match") {
+        statusCls = "status-strong";
+        badgeCls = "badge-strong";
+        icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+    }
+
+    const panel = document.getElementById("decisionPanelCard");
+    const badge = document.getElementById("decisionBadge");
+    const readinessBadge = document.getElementById("jobReadinessBadge");
+
+    if (panel) panel.className = `card decision-panel ${statusCls}`;
+    if (badge) {
+        badge.className = `decision-badge ${badgeCls}`;
+        badge.innerHTML = `${icon} ${rec}`;
+    }
+    if (readinessBadge) {
+        readinessBadge.textContent = readiness;
+        if (readiness === "Not Ready") readinessBadge.style.color = "var(--error)";
+        else if (readiness === "Ready") readinessBadge.style.color = "var(--success)";
+        else readinessBadge.style.color = "var(--warning)";
+    }
+
+    // Intelligence mapping
+    const structuredSum = data.structured_summary || {};
+    if (document.getElementById("studentStrength")) document.getElementById("studentStrength").textContent = structuredSum.strength || "N/A";
+    if (document.getElementById("matchInterpretation")) document.getElementById("matchInterpretation").textContent = structuredSum.interpretation || "N/A";
+    if (document.getElementById("motivationalFeedbackText")) document.getElementById("motivationalFeedbackText").textContent = structuredSum.motivational_feedback || "";
+    
+    if (document.getElementById("progressFeel")) {
+        const pf = structuredSum.progress_feel || "";
+        document.getElementById("progressFeel").textContent = pf;
+        if (pf.includes("excellent") || pf.includes("fantastic")) document.getElementById("progressFeel").classList.add("text-success");
+        else document.getElementById("progressFeel").classList.add("text-muted");
+    }
+
+    if (document.getElementById("bestFitRole")) document.getElementById("bestFitRole").textContent = data.best_fit_role || "N/A";
+    if (document.getElementById("altFitRole")) document.getElementById("altFitRole").textContent = data.alternate_role || "N/A";
+    if (document.getElementById("expAssessment")) document.getElementById("expAssessment").textContent = data.experience_assessment || "N/A";
+    
+    if (document.getElementById("infraAssessment")) {
+        document.getElementById("infraAssessment").textContent = data.infra_assessment || "Adequate";
+        if (data.infra_assessment === "Very Low" || data.infra_assessment === "Low") {
+            document.getElementById("infraAssessment").style.color = "var(--error)";
+        } else if (data.infra_assessment === "Entry-Level (No Cloud/Containers)") {
+            document.getElementById("infraAssessment").style.color = "var(--warning)";
+        } else {
+            document.getElementById("infraAssessment").style.color = "var(--success)";
+        }
+    }
+    
+    if (document.getElementById("coreCoverage")) {
+        document.getElementById("coreCoverage").textContent = (data.core_coverage ?? "0") + "%";
+    }
+
+    // Populate Secondary Component Scores
+    const atsScore = Math.round(data.ats_score || data.overall_match || 0);
     const circle = document.querySelector(".circle-score-fill");
     const valueEl = document.getElementById("atsScoreValue");
     
@@ -177,7 +235,7 @@ function initDashboardPage() {
         const circumference = 2 * Math.PI * radius;
         const offset = circumference - (atsScore / 100) * circumference;
         circle.style.strokeDasharray = `${circumference} ${circumference}`;
-        circle.style.strokeDashoffset = `${circumference}`; // start hidden
+        circle.style.strokeDashoffset = `${circumference}`; 
         
         let currentScore = 0;
         const step = atsScore > 0 ? Math.max(1, Math.floor(atsScore / 30)) : 1;
@@ -189,87 +247,78 @@ function initDashboardPage() {
             }
             valueEl.textContent = currentScore;
         }, 30);
-
-        // Animate stroke smoothly
-        requestAnimationFrame(() => {
-            circle.style.strokeDashoffset = `${offset}`;
-        });
+        requestAnimationFrame(() => circle.style.strokeDashoffset = `${offset}`);
     }
 
-    // Set Level indicators
-    const matchLevel = document.getElementById("pillMatchLevel");
-    const confidencePill = document.getElementById("pillConfidence");
-    if (matchLevel) {
-        let label = "Low Match";
-        let cls = "text-muted";
+    const breakdownContainer = document.getElementById("categoryBreakdown");
+    if (breakdownContainer && data.category_scores) {
+        let html = "";
+        for (const [catName, score] of Object.entries(data.category_scores)) {
+            html += `
+            <div class="cat-row">
+                <div class="cat-header">
+                    <span>${catName}</span>
+                    <span>${score}%</span>
+                </div>
+                <div class="cat-bar-bg">
+                    <div class="cat-bar-fill" style="width: ${score}%;"></div>
+                </div>
+            </div>`;
+        }
+        breakdownContainer.innerHTML = html;
+    }
+
+    // Missing Skill Impacts & Improvements (List Format)
+    const impactContainer = document.getElementById("educationalImpactsContainer");
+    if (impactContainer) {
+        const roadmap = data.roadmap_sequence || [];
         
-        if (atsScore >= 80) { label = "Strong Match"; cls = "text-success"; }
-        else if (atsScore >= 60) { label = "Avg Match"; cls = "text-warning"; }
-        
-        matchLevel.textContent = label;
-        matchLevel.className = `tag tag-soft ${cls}`;
-    }
-    if (confidencePill) {
-        confidencePill.textContent = `Conf: ${confidence}%`;
-    }
-
-    // Insert Candidate Summary text
-    const summaryEl = document.getElementById("candidateSummaryText");
-    if (summaryEl) {
-        summaryEl.textContent = data.summary || "No specific summary provided from AI engine.";
-    }
-
-    // Insert Skills
-    const skillsContainer = document.getElementById("skillsContainer");
-    if (skillsContainer) {
-        const skills = data.matched_skills || [];
-        if (!skills.length) {
-            skillsContainer.innerHTML = '<span class="empty-state-text">No skills successfully detected.</span>';
+        if (!roadmap.length) {
+            impactContainer.innerHTML = '<span class="empty-state-text" style="font-size:0.875rem;">Your resume meets the key foundational skills for this role!</span>';
         } else {
-            skillsContainer.innerHTML = skills
-                .map(skill => `<span class="chip">${skill}</span>`)
-                .join("");
+            let html = "";
+            for (let i = 0; i < roadmap.length; i++) {
+                const step = roadmap[i];
+                let priorityColor = "var(--text-secondary)";
+                if (step.priority === "High Priority") priorityColor = "var(--error)";
+                else if (step.priority === "Medium Priority") priorityColor = "var(--warning)";
+                else priorityColor = "var(--primary)"; // Bonus
+
+                html += `
+                <li style="border-left: 4px solid ${priorityColor}; padding: 1rem; margin-bottom: 0.75rem; border-radius:4px; background: rgba(30,41,59,0.02);">
+                    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                            <span class="font-bold text-xs" style="color: ${priorityColor}; text-transform:uppercase;">Step ${step.step_num}: ${step.skill}</span>
+                            <span class="text-xs" style="background:var(--surface); border: 1px solid var(--border); padding:3px 8px; border-radius:4px; color:var(--text-muted); font-weight:500;">${step.time} - ${step.priority}</span>
+                        </div>
+                        <p class="font-bold text-sm" style="color: var(--text-primary); margin:0; line-height:1.5;"><span style="color:var(--primary);">Action:</span> ${step.action}</p>
+                        <p class="text-xs" style="color: var(--text-secondary); margin:0; line-height: 1.5;"><strong>Why:</strong> ${step.why}</p>
+                    </div>
+                </li>`;
+            }
+            impactContainer.innerHTML = html;
+        }
+    }
+    
+    const quickWinsList = document.getElementById("quickWinsList");
+    const quickWinsContainer = document.getElementById("quickWinsContainer");
+    const wins = data.quick_wins || [];
+    if (quickWinsList && quickWinsContainer) {
+        if (wins.length > 0) {
+            quickWinsContainer.style.display = "block";
+            quickWinsList.innerHTML = wins.map(w => `<li style="margin-bottom:0.5rem; line-height: 1.4;">${w}</li>`).join("");
+        } else {
+            quickWinsContainer.style.display = "none";
         }
     }
 
-    // Split Keywords Matched and Missing
-    const matched = document.getElementById("keywordsMatched");
-    const missing = document.getElementById("keywordsMissing");
-    if (matched) {
-        const arr = data.matched_keywords || data.matched_skills || [];
-        matched.innerHTML = arr.length
-            ? arr.map(k => `<span class="chip chip-soft">${k}</span>`).join("")
-            : '<span class="empty-state-text">None detected.</span>';
-    }
-    if (missing) {
-        const arr = data.missing_keywords || data.critical_gaps || [];
-        missing.innerHTML = arr.length
-            ? arr.map(k => `<span class="chip chip-warning">${k}</span>`).join("")
-            : '<span class="empty-state-text">None indicated.</span>';
-    }
-
-    // Alternative Job Matches rendering
-    const jobsEl = document.getElementById("jobMatches");
-    if (jobsEl) {
-        const roles = data.job_matches || [];
-        if (!roles.length) {
-            jobsEl.innerHTML = '<p class="empty-state-text">No alternative roles found.</p>';
+    const matchedContainer = document.getElementById("matchedSkillsContainer");
+    if (matchedContainer) {
+        const skills = data.matched_keywords || data.matched_skills || [];
+        if (!skills.length) {
+            matchedContainer.innerHTML = '<span class="empty-state-text" style="grid-column: 1 / -1; font-size:0.875rem;">No foundational keywords successfully detected.</span>';
         } else {
-            jobsEl.innerHTML = roles
-                .slice(0, 3)
-                .map(
-                    r => `
-                <article class="job-card">
-                    <div>
-                        <h4>${r.title}</h4>
-                        <p class="text-muted">${r.location || "Flexible / Remote"}</p>
-                    </div>
-                    <div class="job-card-score">
-                        <span>${Math.round(r.match || 0)}%</span>
-                    </div>
-                </article>`
-                )
-                .join("");
+            matchedContainer.innerHTML = skills.map(skill => `<span class="chip chip-success" style="background:rgba(34,197,94,0.1); color:var(--success); border-color:rgba(34,197,94,0.2);">${skill}</span>`).join("");
         }
     }
 }
@@ -310,7 +359,6 @@ ${JSON.stringify(data, null, 2)}
     }
 }
 
-// Router trigger based on embedded data-page attribute
 document.addEventListener("DOMContentLoaded", () => {
     const page = document.body.getAttribute("data-page");
     if (page === "landing") {

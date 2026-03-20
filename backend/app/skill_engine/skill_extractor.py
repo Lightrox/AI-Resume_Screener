@@ -3,6 +3,17 @@ from collections import Counter
 
 nlp = spacy.load("en_core_web_sm")
 
+# Map over-arching concepts to concrete technologies
+SYNONYM_MAP = {
+    "backend": ["flask", "django", "fastapi", "spring", "node", "express", "java", "python"],
+    "frontend": ["html", "css", "javascript", "react", "angular", "vue"],
+    "database": ["sql", "mysql", "postgresql", "mongodb", "redis"],
+    "cloud": ["aws", "gcp", "azure", "docker", "kubernetes"],
+    "api": ["rest", "fastapi", "flask", "express", "graphql"],
+    "ml": ["machine learning", "deep learning", "nlp", "tensorflow", "pytorch", "scikit-learn", "ai"],
+    "programming": ["python", "java", "c++", "c#", "javascript", "typescript"]
+}
+
 TECH_TERMS = {
     "python", "java", "c++", "c#", "javascript", "typescript",
     "html", "css", "react", "angular", "vue",
@@ -10,67 +21,39 @@ TECH_TERMS = {
     "node", "express", "sql", "mysql", "postgresql",
     "mongodb", "firebase", "redis",
     "machine learning", "deep learning", "nlp",
-    "computer vision", "ai", "ml",
+    "computer vision", "ai", "ml", "backend", "frontend", "database", "cloud", "api", "programming",
     "tensorflow", "pytorch", "scikit-learn",
     "numpy", "pandas",
-    "docker", "kubernetes", "aws", "azure",
-    "git", "linux", "rest", "api", "json"
+    "docker", "kubernetes", "aws", "azure", "gcp",
+    "git", "linux", "rest", "graphql", "json"
 }
 
 CANONICAL_MAP = {
-    # Frontend
     "html5": "html",
     "css3": "css",
     "vanilla javascript": "javascript",
     "js": "javascript",
-
-    # Backend
     "python scripts": "python",
-    "developed python scripts": "python",
     "restful api": "rest",
     "restful apis": "rest",
     "rest api": "rest",
     "rest apis": "rest",
-
-    # Cloud / DevOps
     "amazon web services": "aws",
     "node.js": "node",
-    "nodejs": "node",
-
-    # ML
-    "ml": "machine learning",
-    "deep learning models": "deep learning"
+    "nodejs": "node"
 }
-
 
 def normalize_skill(phrase: str):
     phrase = phrase.strip().lower()
-
-    # Exact canonical mapping
+    
     if phrase in CANONICAL_MAP:
         return CANONICAL_MAP[phrase]
 
-    # Partial canonical mapping
     for key in CANONICAL_MAP:
         if key in phrase:
             return CANONICAL_MAP[key]
 
     return phrase
-
-
-def is_valid_skill(phrase: str):
-    if len(phrase.split()) > 3:
-        return False
-
-    if phrase in TECH_TERMS:
-        return True
-
-    for tech in TECH_TERMS:
-        if tech in phrase:
-            return True
-
-    return False
-
 
 def extract_skills(text: str):
     text = text.lower().replace("\n", " ")
@@ -78,34 +61,33 @@ def extract_skills(text: str):
 
     detected = []
 
-    # 1️⃣ Token-level matching (most reliable)
+    # 1. Token-level matching
     for token in doc:
         word = token.text.strip()
 
         if word in TECH_TERMS:
-            normalized = normalize_skill(word)
-            detected.append(normalized)
+            detected.append(normalize_skill(word))
 
         if word in CANONICAL_MAP:
             detected.append(CANONICAL_MAP[word])
 
-    # 2️⃣ Multi-word phrase matching
+    # 2. Multi-word phrases
     for phrase in TECH_TERMS:
         if " " in phrase and phrase in text:
             detected.append(normalize_skill(phrase))
 
-    # Count frequency
     skill_counts = Counter(detected)
 
+    # 3. Add synonym expansion capabilities 
+    # E.g. if we detect 'flask', we can implicitly credit 'backend'
+    # This happens in ats_scorer, but returning distinct skills here
     structured_skills = [
         {"skill": skill, "count": count}
         for skill, count in skill_counts.items()
     ]
-
     structured_skills.sort(key=lambda x: x["count"], reverse=True)
-    total_mentions = sum(skill_counts.values())
 
     return {
         "skills": structured_skills,
-        "total_skill_mentions": total_mentions
+        "raw_skills": list(skill_counts.keys())
     }

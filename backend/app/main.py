@@ -79,43 +79,14 @@ def score_resume(
 
     sections = result["sections"]
 
-    section_weights = {
-        "skills": 1.6,       # declared skills
-        "experience": 1.5,   # real work experience
-        "projects": 1.3,     # applied skills
-        "summary": 1.0,      # mentioned skills
-        "education": 0.7,    # weaker signal
-        "links": 0.0,        # ignore
-        "other": 0.5         # minimal impact
-    }
-    weighted_resume_skills = []
-
-    for section_name, section_text in sections.items():
-        processed = preprocess_resume(section_text)
-        skill_data = extract_skills(processed["light_text"])
-
-        for skill_obj in skill_data["skills"]:
-            weighted_resume_skills.append({
-                "skill": skill_obj["skill"],
-                "count": skill_obj["count"] * section_weights[section_name]
-            })
-    merged = defaultdict(float)
-
-    for item in weighted_resume_skills:
-        merged[item["skill"]] += item["count"]
-
-    final_resume_skills = [
-        {"skill": skill, "count": count}
-        for skill, count in merged.items()
-    ]
-
     # Extract JD skills
     jd_processed = preprocess_resume(jd)
     jd_skill_data = extract_skills(jd_processed["light_text"])
 
     ats_result = compute_ats_score(
-        final_resume_skills,
-        jd_skill_data["skills"]
+        sections,
+        jd,
+        jd_skill_data
     )
 
     return ats_result
