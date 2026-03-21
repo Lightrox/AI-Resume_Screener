@@ -50,7 +50,7 @@ async function analyzeResume(e) {
     showToast("Running AI analysis...", "info");
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/score-resume/", {
+        const response = await fetch("https://ai-resume-screener-9cbi.onrender.com/score-resume/", {
             method: "POST",
             body: formData
         });
@@ -60,11 +60,11 @@ async function analyzeResume(e) {
         }
 
         const data = await response.json();
-        
+
         // Cache to Session
         sessionStorage.setItem("analysisResult", JSON.stringify(data));
         localStorage.setItem("analysisResult", JSON.stringify(data));
-        
+
         showToast("Analysis complete. Loading dashboard...", "success");
         setTimeout(() => {
             window.location.href = "dashboard.html";
@@ -138,7 +138,7 @@ function initDashboardPage() {
     const content = document.getElementById("dashboardContent");
 
     const stored = sessionStorage.getItem("analysisResult") || localStorage.getItem("analysisResult");
-    
+
     if (!stored) {
         if (loading) loading.classList.add("hidden");
         if (content) {
@@ -162,7 +162,7 @@ function initDashboardPage() {
     // Populate Mentorship Panel (Top)
     const rec = data.match_level || "Moderate Match";
     const readiness = data.job_readiness || "Partially Ready";
-    
+
     let statusCls = "status-consider";
     let badgeCls = "badge-consider";
     let icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
@@ -198,7 +198,7 @@ function initDashboardPage() {
     if (document.getElementById("studentStrength")) document.getElementById("studentStrength").textContent = structuredSum.strength || "N/A";
     if (document.getElementById("matchInterpretation")) document.getElementById("matchInterpretation").textContent = structuredSum.interpretation || "N/A";
     if (document.getElementById("motivationalFeedbackText")) document.getElementById("motivationalFeedbackText").textContent = structuredSum.motivational_feedback || "";
-    
+
     if (document.getElementById("progressFeel")) {
         const pf = structuredSum.progress_feel || "";
         document.getElementById("progressFeel").textContent = pf;
@@ -209,7 +209,7 @@ function initDashboardPage() {
     if (document.getElementById("bestFitRole")) document.getElementById("bestFitRole").textContent = data.best_fit_role || "N/A";
     if (document.getElementById("altFitRole")) document.getElementById("altFitRole").textContent = data.alternate_role || "N/A";
     if (document.getElementById("expAssessment")) document.getElementById("expAssessment").textContent = data.experience_assessment || "N/A";
-    
+
     if (document.getElementById("infraAssessment")) {
         document.getElementById("infraAssessment").textContent = data.infra_assessment || "Adequate";
         if (data.infra_assessment === "Very Low" || data.infra_assessment === "Low") {
@@ -220,7 +220,7 @@ function initDashboardPage() {
             document.getElementById("infraAssessment").style.color = "var(--success)";
         }
     }
-    
+
     if (document.getElementById("coreCoverage")) {
         document.getElementById("coreCoverage").textContent = (data.core_coverage ?? "0") + "%";
     }
@@ -229,14 +229,14 @@ function initDashboardPage() {
     const atsScore = Math.round(data.ats_score || data.overall_match || 0);
     const circle = document.querySelector(".circle-score-fill");
     const valueEl = document.getElementById("atsScoreValue");
-    
+
     if (circle && valueEl) {
         const radius = 48;
         const circumference = 2 * Math.PI * radius;
         const offset = circumference - (atsScore / 100) * circumference;
         circle.style.strokeDasharray = `${circumference} ${circumference}`;
-        circle.style.strokeDashoffset = `${circumference}`; 
-        
+        circle.style.strokeDashoffset = `${circumference}`;
+
         let currentScore = 0;
         const step = atsScore > 0 ? Math.max(1, Math.floor(atsScore / 30)) : 1;
         const timer = setInterval(() => {
@@ -272,7 +272,7 @@ function initDashboardPage() {
     const impactContainer = document.getElementById("educationalImpactsContainer");
     if (impactContainer) {
         const roadmap = data.roadmap_sequence || [];
-        
+
         if (!roadmap.length) {
             impactContainer.innerHTML = '<span class="empty-state-text" style="font-size:0.875rem;">Your resume meets the key foundational skills for this role!</span>';
         } else {
@@ -299,7 +299,7 @@ function initDashboardPage() {
             impactContainer.innerHTML = html;
         }
     }
-    
+
     const quickWinsList = document.getElementById("quickWinsList");
     const quickWinsContainer = document.getElementById("quickWinsContainer");
     const wins = data.quick_wins || [];
@@ -326,7 +326,7 @@ function initDashboardPage() {
 function initResultsPage() {
     const resultsContainer = document.getElementById("results");
     const stored = sessionStorage.getItem("analysisResult") || localStorage.getItem("analysisResult");
-    
+
     if (!stored) {
         if (resultsContainer) {
             resultsContainer.innerHTML = `

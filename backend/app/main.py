@@ -16,10 +16,8 @@ class JDInput(BaseModel):
 app = FastAPI(title="AI Resume Screener")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    # We don't rely on cookies/auth for this frontend request, so avoid
-    # credentialed CORS headers (makes behavior more predictable).
-    allow_credentials=False,
+    allow_origins=["*"],  # For now (later restrict)
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
