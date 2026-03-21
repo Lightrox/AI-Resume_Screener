@@ -4,7 +4,7 @@ services:
     env: python
     region: ohio # Change as needed
     plan: free
-    repo: https://github.com/YourGitHubUsername/YourRepoName # Update this!
+    repo: https://github.com/Lightrox/AI-Resume_Screener # Update this!
     branch: main
     rootDir: backend
     buildCommand: "pip install -r requirements.txt"

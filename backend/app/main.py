@@ -3,9 +3,9 @@ import shutil
 import os
 import uuid
 from collections import defaultdict
-from app.preprocessing.text_preprocessor import preprocess_resume
-from app.skill_engine.skill_extractor import extract_skills
-from app.scoring.ats_scorer import compute_ats_score
+from .preprocessing.text_preprocessor import preprocess_resume
+from .skill_engine.skill_extractor import extract_skills
+from .scoring.ats_scorer import compute_ats_score
 from .parser.resume_parser import parse_resume
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware

@@ -1,7 +1,7 @@
 import random
 import re
-from app.preprocessing.text_preprocessor import preprocess_resume
-from app.skill_engine.skill_extractor import extract_skills, SYNONYM_MAP
+from ..preprocessing.text_preprocessor import preprocess_resume
+from ..skill_engine.skill_extractor import extract_skills, SYNONYM_MAP
 
 def get_expanded_skills(skill_list):
     expanded = set(skill_list)
