@@ -194,6 +194,14 @@ def generate_student_strength(matched_skills, final_score):
     else:
         return f"You align with some foundational requirements, including {top_str}."
 
+def generate_motivational_feedback(final_score):
+    if final_score >= 75:
+        return "Excellent match! Focus on any minor gaps to solidify your profile."
+    elif final_score >= 50:
+        return "Good foundation. Follow the roadmap below to improve your chances."
+    else:
+        return "There is significant room for growth. Start with the basics outlined to build your skills."
+
 def build_roadmap_sequence(critical_missing, nice_to_have_missing, final_score, jd_domain, cand_domain, core_coverage):
     all_missing = critical_missing + nice_to_have_missing
     if not all_missing:
@@ -464,7 +472,8 @@ def compute_ats_score(resume_sections, jd_text, jd_skill_data):
         },
         "structured_summary": {
             "interpretation": f"Your resume matches {int(domain_match_score)}% of the core requirements. You are {job_readiness.lower()} for this role.",
-            "strength": generate_student_strength(matched_kws, final_score)
+            "strength": generate_student_strength(matched_kws, final_score),
+            "motivational_feedback": generate_motivational_feedback(final_score)
         },
         "matched_keywords": matched_kws,
         "missing_keywords": missing_kws
